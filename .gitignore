@@ -12,6 +12,7 @@ creator-99ddf-firebase-adminsdk-nf38h-cc33e2ec46.json
 
 .firebase-debug.log
  api_logs.txt
+ui-debug.log
 
 # Coverage and Build Artifacts
 coverage/
