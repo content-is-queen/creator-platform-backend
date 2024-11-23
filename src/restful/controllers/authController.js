@@ -445,10 +445,13 @@ class AuthController {
   }
 
   static async deleteAccount(req, res) {
-    const { fullName } = req.body;
-    const { user_id, role } = req.user;
-    if (!fullName) {
-      return res.status(400).json({ message: "Full name is required" });
+    const { user_id, role, email } = req.user;
+    if (!req.body.email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (email !== req.body.email) {
+      return res.status(400).json({ message: "Incorrect email provided" });
     }
 
     const db = admin.firestore();
@@ -464,21 +467,13 @@ class AuthController {
 
       const userData = userDocSnapshot.data();
 
-      const storedFullName = `${userData.firstName.trim()} ${userData.lastName.trim()}`;
-      if (storedFullName !== fullName.trim()) {
-        return res.status(400).json({
-          message:
-            "Full name does not match. Please provide correct name to confirm account deletion.",
-        });
-      }
-
       if (userData.profilePhoto) {
         // Extract the filename from the profilePhoto URL or path
         const fileName = userData.profilePhoto.split("/").pop();
 
         // Delete the file from Firebase Storage
         const storageRef = admin.storage().bucket();
-        await storageRef.file(`profile/picture/${fileName}`).delete();
+        await storageRef.file(`profilePhotos/${user_id}-${fileName}`).delete();
       }
 
       // Archive open or in-progress opportunities/applications based on user role
