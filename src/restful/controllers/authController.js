@@ -439,6 +439,75 @@ class AuthController {
       return util.send(res);
     }
   }
+
+  static async deleteAccount(req, res) {
+    const { user_id, role, email } = req.user;
+    if (!req.body.email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (email !== req.body.email) {
+      return res.status(400).json({ message: "Incorrect email provided" });
+    }
+
+    const db = admin.firestore();
+
+    try {
+      // Retrieve user data to validate full name
+      const userDocRef = db.collection("users").doc(user_id);
+      const userDocSnapshot = await userDocRef.get();
+
+      if (!userDocSnapshot.exists) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userData = userDocSnapshot.data();
+
+      if (userData.profilePhoto) {
+        // Extract the filename from the profilePhoto URL or path
+        const fileName = userData.profilePhoto.split("/").pop();
+
+        // Delete the file from Firebase Storage
+        const storageRef = admin.storage().bucket();
+        await storageRef.file(`profilePhotos/${user_id}-${fileName}`).delete();
+      }
+
+      // Archive open or in-progress opportunities/applications based on user role
+      if (role === "brand" || role === "admin") {
+        const opportunitiesRef = db
+          .collection("opportunities")
+          .where("status", "in", ["open", "in_progress"])
+          .where("ownerId", "==", user_id);
+
+        const opportunitiesSnapshot = await opportunitiesRef.get();
+        const archivePromises = opportunitiesSnapshot.docs.map((doc) =>
+          doc.ref.update({ status: "archived" }),
+        );
+        await Promise.all(archivePromises);
+      } else if (role === "creator") {
+        const applicationsRef = db
+          .collection("applications")
+          .where("status", "in", ["open", "in_progress"])
+          .where("creatorId", "==", user_id);
+
+        const applicationsSnapshot = await applicationsRef.get();
+        const archivePromises = applicationsSnapshot.docs.map((doc) =>
+          doc.ref.update({ status: "archived" }),
+        );
+        await Promise.all(archivePromises);
+      }
+
+      // Delete user from Firestore
+      await userDocRef.delete();
+
+      // Delete user from Firebase Authentication
+      await admin.auth().deleteUser(user_id);
+
+      return res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message || "Server error" });
+    }
+  }
 }
 
 exports.AuthController = AuthController;
