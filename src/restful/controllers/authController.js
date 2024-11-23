@@ -35,7 +35,7 @@ const schema = {
   creator: Joi.object({
     ...defaultSchema,
     podcastName: Joi.string().allow(""),
-    podcastUrl: Joi.string().uri().allow(""),
+    podcastUrl: Joi.string().allow(""),
     profilePhoto: Joi.string().allow(""),
     interests: Joi.array().allow(""),
     showreel: Joi.string().uri().allow(""),
