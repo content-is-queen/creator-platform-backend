@@ -67,12 +67,16 @@ class OpportunitiesController {
     const { limit = 10, page = 1 } = req.query;
     const parsedLimit = parseInt(limit);
     const parsedPage = parseInt(page);
+    const formattedDate = new Intl.DateTimeFormat("en-CA")
+      .format(new Date())
+      .replace(/-/g, "/");
 
     try {
       // Fetch the initial set of documents to determine the correct starting point
       const query = db
         .collection("opportunities")
         .where("status", "!=", "archived")
+        .where("deadline", ">=", formattedDate)
         .orderBy("createdAt", "desc");
 
       const initialSnapshot = await query.get();
