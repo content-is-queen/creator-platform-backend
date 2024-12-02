@@ -291,11 +291,21 @@ class AdminController {
           const userDoc = await userRef.get();
           const userData = userDoc.data();
           const opportunityId = doc.id;
+          const applicationsSnapshot = await db
+            .collection("applications")
+            .where("opportunityId", "==", opportunityId)
+            .get();
+
+          const applications = applicationsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          console.log(applications);
 
           return {
             ...opportunityData,
-            numberOfApplications:
-              opportunityApplicationsCount[opportunityId] || 0,
+            applications,
             fullName: userData?.firstName + " " + userData?.lastName,
           };
         },
