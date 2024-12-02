@@ -15,8 +15,8 @@ const createCheckoutSession = async (req, res) => {
   const { role } = req.body;
 
   const productId = {
-    brand: "price_1PdwrBA0tTttcwfyIDPVzj99",
-    creator: "price_1PdwluA0tTttcwfyYpc4jGVz",
+    brand: "prod_RKIfTDNwEdCzcL",
+    creator: "prod_RKIdY6EWujNqsv",
   };
   try {
     const session = await stripe.checkout.sessions.create({
