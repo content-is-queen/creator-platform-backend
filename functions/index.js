@@ -1,4 +1,4 @@
-const stripe = require("stripe")(process.env.SK_TEST);
+const stripe = require("stripe")(process.env.STRIPE_SK);
 require("firebase-functions/logger/compat");
 
 const { onRequest, HttpsError } = require("firebase-functions/v2/https");

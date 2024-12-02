@@ -1,6 +1,6 @@
 // controllers/paymentController.js
 
-const stripe = require("stripe")(process.env.SK_TEST); // Make sure to set your Stripe secret key in your environment variables
+const stripe = require("stripe")(process.env.STRIPE_SK); // Make sure to set your Stripe secret key in your environment variables
 const admin = require("firebase-admin");
 
 /**
