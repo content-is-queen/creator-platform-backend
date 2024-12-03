@@ -6,6 +6,9 @@ const transporter = require("../../helper/mailHelper");
 const admin = require("firebase-admin");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const {
+  sendEmailVerification,
+} = require("../../services/templates/SendEmailVerification");
 
 dotenv.config();
 /**
@@ -57,13 +60,14 @@ class AuthController {
    */
 
   static async signup(req, res) {
+    let user;
     try {
       const { firstName, lastName, email, password, role, ...other } = req.body;
 
       await schema[role].validateAsync(req.body);
 
       const db = admin.firestore();
-      const user = await admin.auth().createUser({ email, password });
+      user = await admin.auth().createUser({ email, password });
 
       const uid = user.uid;
       await admin.auth().setCustomUserClaims(uid, { role, subscribed: false });
@@ -80,12 +84,32 @@ class AuthController {
         subscribed: false,
         ...other,
       });
+      const actionCodeSettings = {
+        url: `${process.env.DOMAIN}/login`,
+        handleCodeInApp: true,
+      };
 
+      const emailVerificationLink = await admin
+        .auth()
+        .generateEmailVerificationLink(email, actionCodeSettings);
+      const emailData = {
+        name: firstName,
+        link: emailVerificationLink,
+      };
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: "Verify Your Email Address for Creator Platform",
+        html: sendEmailVerification(emailData),
+      };
+      await transporter.sendMail(mailOptions);
       util.statusCode = 200;
       util.setSuccess(200, "Success", { email, uid });
       return util.send(res);
     } catch (error) {
-      console.log(error);
+      if (user) {
+        await admin.auth().deleteUser(user.uid);
+      }
       const errorMessage = error?.errorInfo?.message;
       util.statusCode = 500;
       util.message = errorMessage || error.message || " ";
