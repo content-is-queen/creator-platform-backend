@@ -1,6 +1,7 @@
 {
   "projects": {
     "staging": "contentisqueen-97ae5",
-    "production": "creator-platform---production"
+    "production": "creator-platform---production",
+    "default": "creator-platform---production"
   }
 }
