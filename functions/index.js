@@ -1,11 +1,30 @@
 const stripe = require("stripe")(process.env.STRIPE_SK);
-require("firebase-functions/logger/compat");
 
+require("firebase-functions/logger/compat");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest, HttpsError } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
+const {
+  AdminController,
+} = require("../src/restful/controllers/adminController");
+const {
+  OpportunitiesController,
+} = require("../src/restful/controllers/opportunitiesController");
 
 const secret = process.env.STRIPE_WHSEC;
+
+exports.resetUsersLimit = onSchedule("0 0 1 * *", async () => {
+  await AdminController.resetAllUsersLimit();
+
+  logger.log("User limits reset");
+});
+
+exports.closeExpiredOpportunities = onSchedule("0 0 * * *", async () => {
+  await OpportunitiesController.deleteExpiredOpportunities();
+
+  logger.log("Expired opportunities deleted");
+});
 
 exports.stripeEvent = onRequest(async (request, response) => {
   const signature = request.headers["stripe-signature"];

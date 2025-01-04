@@ -14,16 +14,16 @@ const createCheckoutSession = async (req, res) => {
 
   const { role } = req.body;
 
-  const productId = {
-    brand: "prod_RKIfTDNwEdCzcL",
-    creator: "prod_RKIdY6EWujNqsv",
+  const product = {
+    brand: "price_1QRe4CA0tTttcwfyG3erBU5D",
+    creator: "price_1QRe27A0tTttcwfyik9VAcdA",
   };
+
   try {
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       line_items: [
         {
-          price: productId[role],
+          price: product[role],
           quantity: 1,
         },
       ],
@@ -36,11 +36,9 @@ const createCheckoutSession = async (req, res) => {
 
     res.status(200).json({ id: session.id });
   } catch (error) {
-    console.error("Error creating checkout session backend:", error);
+    console.error("Error creating checkout session backend:", error.code);
     res.status(500).json({
-      error: {
-        message: "An error occurred while creating the checkout session.",
-      },
+      error,
     });
   }
 };

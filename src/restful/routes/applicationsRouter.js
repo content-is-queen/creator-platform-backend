@@ -9,12 +9,7 @@ const allowedRole = require("../../helper/allowedRole");
 const router = Router();
 
 // GET all applications
-router.get(
-  "/",
-  protect,
-  allowedRole(["admin", "super_admin", "brand"]),
-  ApplicationsController.getAllApplications,
-);
+router.get("/", protect, ApplicationsController.getAllApplications);
 
 // GET applications by opportunity ID
 router.get(
@@ -28,7 +23,6 @@ router.get(
 router.get(
   "/user/:userId",
   protect,
-  allowedRole(["admin", "super_admin", "brand"]),
   ApplicationsController.getApplicationsByUserId,
 );
 
@@ -52,7 +46,6 @@ router.post(
 router.patch(
   "/:applicationId",
   protect,
-  allowedRole(["admin", "super_admin", "brand"]),
   ApplicationsController.updateApplication,
 );
 
@@ -60,7 +53,6 @@ router.patch(
 router.delete(
   "/:applicationId",
   protect,
-  allowedRole(["admin", "super_admin", "brand"]),
   ApplicationsController.deleteApplication,
 );
 
