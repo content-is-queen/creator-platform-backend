@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
-const admin = require("firebase-admin");
+const admin = require("../../../functions/admin");
 const { v4: uuidv4 } = require("uuid"); // Import uuidv4 directly
 const Joi = require("joi");
 
@@ -235,7 +235,10 @@ class OpportunitiesController {
     const { status } = req.params;
     const { limit = 10, startAfter: startAfterId = null } = req.query;
 
-    if (!status || !["open", "in_progress", "completed"].includes(status)) {
+    if (
+      !status ||
+      !["open", "in_progress", "completed", "closed"].includes(status)
+    ) {
       util.statusCode = 400;
       util.message = "Invalid or missing opportunity status";
       return util.send(res);
@@ -436,36 +439,6 @@ class OpportunitiesController {
 
   static async createCampaignOpportunity(req, res) {
     return OpportunitiesController.createOpportunity(req, res, "campaign");
-  }
-
-  static async deleteExpiredOpportunities(req, res) {
-    const db = admin.firestore();
-    const now = new Date();
-    const currentDateString = now.toISOString().split("T")[0];
-
-    try {
-      // Fetch opportunities where the deadline has passed
-      const opportunitiesRef = db.collection("opportunities");
-      const snapshot = await opportunitiesRef
-        .where("endDate", "<", currentDateString)
-        .get();
-
-      if (snapshot.empty) {
-        console.log("No expired opportunities found");
-        return;
-      }
-
-      // Batch update the status of expired opportunities to "archived"
-      const batch = db.batch();
-      snapshot.docs.forEach((doc) => {
-        batch.update(doc.ref, { status: "archived" });
-      });
-
-      await batch.commit();
-      console.log("Expired opportunities archived successfully");
-    } catch (error) {
-      console.error("Error archiving expired opportunities:", error);
-    }
   }
 }
 

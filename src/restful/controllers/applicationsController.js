@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
-const admin = require("firebase-admin");
+const admin = require("../../../functions/admin");
 const { sendAcceptEmail } = require("../../services/templates/SendAcceptEmail");
 const transporter = require("../../helper/mailHelper");
 const sendNotification = require("../../helper/sendNotification");

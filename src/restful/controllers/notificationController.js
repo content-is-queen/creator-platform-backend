@@ -2,7 +2,7 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
 /* eslint-disable quotes */
-const admin = require("firebase-admin");
+const admin = require("../../../functions/admin");
 
 dotenv.config();
 /**

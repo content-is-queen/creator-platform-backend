@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
 const SendPasswordReset = require("../../services/templates/SendPasswordReset");
 const transporter = require("../../helper/mailHelper");
-const admin = require("firebase-admin");
+const admin = require("../../../functions/admin");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 

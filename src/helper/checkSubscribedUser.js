@@ -1,4 +1,4 @@
-const admin = require("firebase-admin");
+const admin = require("../../functions/admin");
 const { Util } = require("./utils");
 
 const util = new Util();

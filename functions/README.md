@@ -34,10 +34,14 @@ stripe login
 stripe listen --forward-to http://127.0.0.1:5001/creator-platform---production/us-central1/stripeEvent
 ```
 
-6. Trigger a customer deleted event
+6. Trigger a customer event
 
 ```
 stripe trigger customer.subscription.deleted
+```
+
+```
+stripe trigger invoice.paid
 ```
 
 ### Deployment
