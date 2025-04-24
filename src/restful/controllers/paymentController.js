@@ -12,29 +12,31 @@ const admin = require("../../../functions/admin");
 const createCheckoutSession = async (req, res) => {
   const origin = req.headers.origin || process.env.DOMAIN;
 
-  const { role } = req.body;
+  const { email, role } = req.user;
 
   const product = {
-    brand: "price_1QRe4CA0tTttcwfyG3erBU5D",
-    creator: "price_1QRe27A0tTttcwfyik9VAcdA",
+    brand: process.env.STRIPE_P_BRAND,
+    creator: process.env.STRIPE_P_CREATOR,
   };
 
   try {
     const session = await stripe.checkout.sessions.create({
+      ui_mode: "embedded",
       line_items: [
         {
           price: product[role],
           quantity: 1,
         },
       ],
+      customer_email: email,
       mode: "subscription",
-      success_url: `${origin}/thankyou?sessionId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/plus`,
+      return_url: `${origin}/return?sessionId={CHECKOUT_SESSION_ID}`,
+      automatic_tax: { enabled: true },
     });
 
-    console.log("Created checkout session:", session.id); // Logging session ID
+    console.log("Created checkout session:", session.id);
 
-    res.status(200).json({ id: session.id });
+    res.status(200).json({ clientSecret: session.client_secret });
   } catch (error) {
     console.error("Error creating checkout session backend:", error.code);
     res.status(500).json({
@@ -95,8 +97,10 @@ const subscribeUser = async (req, res) => {
 
       await admin.auth().setCustomUserClaims(userId, { subscribed: true });
 
-      res.status(200).json({ session, subscriptionId });
+      console.log(`${userId} subscribed successfully`);
+      res.status(200).json({ status: session.status, subscriptionId });
     } else {
+      console.log(`Problem subscribing ${userId}`);
       res.status(400).json({
         error: {
           message: "Payment not completed.",
@@ -122,9 +126,15 @@ const getUserPaymentInfo = async (req, res) => {
     if (!userDoc.exists) {
       return res.status(404).json({ error: "User not found" });
     }
-    const { subscriptionId, subscribed } = userDoc.data();
+    const { subscriptionId } = userDoc.data();
 
-    res.status(200).json({ subscriptionId, subscribed });
+    if (!subscriptionId) {
+      res
+        .status(404)
+        .json({ error: { message: "Subscription id couldn't be found." } });
+    }
+
+    res.status(200).json({ subscriptionId });
   } catch (error) {
     console.error("Error getting user payment info:", error);
     res.status(500).json({

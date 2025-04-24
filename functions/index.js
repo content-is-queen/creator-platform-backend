@@ -27,24 +27,12 @@ const resetAllUsersLimit = async () => {
         if (userRole === "brand") {
           batch.update(userRef, {
             opportunitiesPostedCount: 0,
-            // ...(userObj.hasOwnProperty("opportunitiesAppliedCount")
-            //   ? {
-            //       opportunitiesAppliedCount:
-            //         admin.firestore.FieldValue.delete(),
-            //     }
-            //   : {}),
           });
         }
 
         if (userRole === "creator") {
           batch.update(userRef, {
             opportunitiesAppliedCount: 0,
-            // ...(userObj.hasOwnProperty("opportunitiesPostedCount")
-            //   ? {
-            //       opportunitiesPostedCount:
-            //         admin.firestore.FieldValue.delete(),
-            //     }
-            //   : {}),
           });
         }
       });
@@ -67,7 +55,7 @@ const deleteExpiredOpportunities = async () => {
     const snapshot = await db
       .collection("opportunities")
       .where("deadline", "<=", now)
-      .where("status", "not-in", ["archived", "closed"])
+      .where("status", "==", "open")
       .get();
 
     const batch = db.batch();
@@ -78,9 +66,9 @@ const deleteExpiredOpportunities = async () => {
     });
 
     await batch.commit();
-    logger.log(`Archived ${snapshot.size} expired opportunities.`);
+    logger.log(`Closed ${snapshot.size} expired opportunities.`);
   } catch (error) {
-    logger.error("unknown", "Error deleting expired opportunities:", error);
+    logger.error("unknown", "Error closing expired opportunities:", error);
     throw error;
   }
 };
@@ -88,15 +76,7 @@ const deleteExpiredOpportunities = async () => {
 exports.resetUsersLimit = functions.pubsub
   .schedule("0 0 1 * *")
   .onRun(async () => {
-    try {
-      await resetAllUsersLimit;
-      logger.log("User limits reset successfully.");
-    } catch (error) {
-      logger.error(
-        "unknown",
-        `There was a problem resetting user limits: ${error}`,
-      );
-    }
+    await resetAllUsersLimit();
   });
 
 exports.closeExpiredOpportunities = functions.pubsub
@@ -125,7 +105,7 @@ exports.stripeEvent = functions.https.onRequest(async (request, response) => {
 
       if (snapshot.empty) {
         logger.warn(`No user found with subscription ID: ${subscriptionId}`);
-        return response.status(200).send("No matching user found.");
+        return response.status(404);
       }
 
       for (const doc of snapshot.docs) {
@@ -133,16 +113,14 @@ exports.stripeEvent = functions.https.onRequest(async (request, response) => {
         await admin.auth().setCustomUserClaims(doc.id, { subscribed: false });
       }
 
-      return response
-        .status(200)
-        .send(
-          `Removed subscription ID: ${subscriptionId} from ${snapshot.size} user(s).`,
-        );
+      logger.log(
+        `Removed subscription ID: ${subscriptionId} from ${snapshot.size} user(s).`,
+      );
     }
 
-    return response.status(200).send("Unhandled event type");
+    return response.status(200);
   } catch (error) {
     logger.error("Error constructing Stripe event:", error);
-    return response.status(400).send(`Webhook error: ${error.message}`);
+    return response.status(400);
   }
 });
