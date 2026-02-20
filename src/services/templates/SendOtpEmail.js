@@ -4,7 +4,7 @@ dotenv.config();
 
 const sendOtpEmail = (emailData) => {
   const otp = `${emailData.otp}`;
-  const template = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -72,7 +72,6 @@ const sendOtpEmail = (emailData) => {
       </div>
   </body>
   </html>`;
-  return template;
 };
 
 module.exports.sendOtpEmail = sendOtpEmail;

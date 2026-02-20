@@ -20,7 +20,7 @@ router.get(
 );
 
 // POST endpoint for creating opportunities
-router.post("/", protect, checkSubscribedUser(), async (req, res) => {
+router.post("/", protect, checkSubscribedUser, async (req, res) => {
   const { type } = req.body;
   if (!type || !["job", "pitch", "campaign"].includes(type)) {
     return res

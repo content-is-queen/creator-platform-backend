@@ -206,21 +206,21 @@ class ApplicationsController {
           name: firstName,
           title,
         };
-        const emailTemplate = SendReceiveApllicationEmail(data);
+        // const emailTemplate = SendReceiveApllicationEmail(data);
 
-        const mailOptions = {
-          from: process.env.EMAIL,
-          to: email,
-          subject: `Application received for ${title}`,
-          html: emailTemplate,
-        };
-
-        await transporter.sendMail(mailOptions);
-        const notificationData = {
-          body: `You have received an application for ${title}`,
-          userId: uid,
-        };
-        await sendNotification(notificationData);
+        // const mailOptions = {
+        //   from: process.env.EMAIL,
+        //   to: email,
+        //   subject: `Application received for ${title}`,
+        //   html: emailTemplate,
+        // };
+        //
+        // await transporter.sendMail(mailOptions);
+        // const notificationData = {
+        //   body: `You have received an application for ${title}`,
+        //   userId: uid,
+        // };
+        // await sendNotification(notificationData);
       }
       util.statusCode = 201;
       util.message = newApplicationData;
@@ -266,14 +266,14 @@ class ApplicationsController {
           if (email) {
             const emailTemplate = sendAcceptEmail(payLoad);
 
-            const mailOptions = {
-              from: process.env.EMAIL,
-              to: email,
-              subject: `Application update for ${opportunityTitle}`,
-              html: emailTemplate,
-            };
-
-            await transporter.sendMail(mailOptions);
+            // const mailOptions = {
+            //   from: process.env.EMAIL,
+            //   to: email,
+            //   subject: `Application update for ${opportunityTitle}`,
+            //   html: emailTemplate,
+            // };
+            //
+            // await transporter.sendMail(mailOptions);
           }
           if (uid) {
             const notificationData = {
@@ -297,16 +297,16 @@ class ApplicationsController {
               firstName,
               opportunityTitle,
             };
-            const emailTemplate = sendRejectEmail(payLoad);
-
-            const mailOptions = {
-              from: process.env.EMAIL,
-              to: email,
-              subject: `Creator Platform Application Update for ${opportunityTitle}`,
-              html: emailTemplate,
-            };
-
-            await transporter.sendMail(mailOptions);
+            // const emailTemplate = sendRejectEmail(payLoad);
+            //
+            // const mailOptions = {
+            //   from: process.env.EMAIL,
+            //   to: email,
+            //   subject: `Creator Platform Application Update for ${opportunityTitle}`,
+            //   html: emailTemplate,
+            // };
+            //
+            // await transporter.sendMail(mailOptions);
           }
           if (uid) {
             const notificationData = {

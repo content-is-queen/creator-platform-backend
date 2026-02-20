@@ -251,7 +251,7 @@ class AdminController {
       return util.send(res);
     } catch (error) {
       util.statusCode = 500;
-      util.message = error.mesage || "Server error";
+      util.message = error.message || "Server error";
       return util.send(res);
     }
   }

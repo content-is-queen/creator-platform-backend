@@ -13,11 +13,11 @@ router.delete("/delete-account", protect, AuthController.deleteAccount);
 
 router.post("/user", protect, AuthController.updateUser);
 router.post("/signup", AuthController.signup);
-router.post("/verify", AuthController.verifyOtp);
 router.post("/forgot", AuthController.forgetPassword);
 router.post("/reset", AuthController.resetUserPassword);
 router.post("/password", protect, AuthController.changePassword);
 router.post("/emailupdate", protect, AuthController.changeEmail);
+router.post("/send-otp", protect, AuthController.sendOtp);
 
 router.put("/subscription", protect, AuthController.updateUserSubscription);
 

@@ -6,6 +6,8 @@ const transporter = require("../../helper/mailHelper");
 const admin = require("../../../functions/admin");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const randomstring = require("randomstring");
+const { sendOtpEmail } = require("../../services/templates/SendOtpEmail");
 
 dotenv.config();
 /**
@@ -65,24 +67,31 @@ class AuthController {
       const db = admin.firestore();
       const user = await admin.auth().createUser({ email, password });
 
-      const uid = user.uid;
-      await admin.auth().setCustomUserClaims(uid, { role, subscribed: false });
-
       const usersCollectionRef = db.collection("users");
 
-      await usersCollectionRef.doc(user.uid).set({
-        uid: user.uid,
-        firstName,
-        lastName,
-        role,
-        email,
-        disabled: false,
-        subscribed: false,
-        ...other,
-      });
+      try {
+        await Promise.all([
+          admin
+            .auth()
+            .setCustomUserClaims(user.uid, { role, subscribed: false }),
+          usersCollectionRef.doc(user.uid).set({
+            uid: user.uid,
+            firstName,
+            lastName,
+            role,
+            email,
+            disabled: false,
+            subscribed: false,
+            ...other,
+          }),
+        ]);
+      } catch (error) {
+        await admin.auth().deleteUser(user.uid);
+        throw new Error(`Failed to complete user setup: ${error.message}`);
+      }
 
       util.statusCode = 200;
-      util.setSuccess(200, "Success", { email, uid });
+      util.setSuccess(200, "Success", { email, uid: user.uid });
       return util.send(res);
     } catch (error) {
       console.log(error);
@@ -93,34 +102,30 @@ class AuthController {
     }
   }
 
-  static async verifyOtp(req, res) {
+  static async sendOtp(req, res) {
     try {
-      const { email, otp, uid } = req.body;
+      const { email } = req.user;
+      const otp = randomstring.generate({
+        length: 5,
+        charset: "numeric",
+      });
+
       const db = admin.firestore();
 
-      // Retrieve OTP document
-      const otpDoc = await db.collection("otp").doc(email).get();
-      const savedOTP = otpDoc.data()?.otp;
+      await db.collection("otp").doc(email).set({ otp });
 
-      if (savedOTP !== otp) {
-        util.statusCode = 400;
-        util.message = "Invalid OTP";
-        return util.send(res);
-      }
-      const currentClaims =
-        (await admin.auth().getUser(uid)).customClaims || {};
-      const updatedClaims = {
-        ...currentClaims,
-        emailVerified: true,
-      };
-      await admin.auth().setCustomUserClaims(uid, updatedClaims);
-      await db.collection("otp").doc(email).delete();
-
+      // const mailOptions = {
+      //   from: process.env.EMAIL,
+      //   to: email,
+      //   subject: "Verify your email address",
+      //   html: sendOtpEmail({ otp }),
+      // };
+      // await transporter.sendMail(mailOptions);
       util.statusCode = 200;
-      util.message = "Your account has been successfully verified.";
+      util.message = "OTP code created and sent";
       return util.send(res);
     } catch (error) {
-      console.error("Error verifying OTP:", error);
+      console.error("Error sending OTP:", error);
       const errorMessage =
         error?.errorInfo?.message || error.message || "Server error";
       util.statusCode = 500;
@@ -136,19 +141,6 @@ class AuthController {
       if (userRecord.email !== email) {
         return res.status(404).json({ res: "This email is not registered" });
       }
-      const secret = process.env.JWT_SECRET + userRecord.uid;
-      const payload = {
-        uid: userRecord.uid,
-      };
-      const token = jwt.sign(payload, secret, { expiresIn: "15m" });
-      const link = `${process.env.DOMAIN}/reset-password?token=${token}`;
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: email,
-        subject: "Password Reset Request for Your Creator Platform Account",
-        html: SendPasswordReset(link),
-      };
-      await transporter.sendMail(mailOptions);
       return res
         .status(200)
         .json({ message: "Password reset email sent successfully" });

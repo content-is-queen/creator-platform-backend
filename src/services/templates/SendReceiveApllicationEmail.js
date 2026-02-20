@@ -4,7 +4,7 @@ dotenv.config();
 
 const SendReceiveApllicationEmail = (data) => {
   const { name, title } = data;
-  const template = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
   <html lang="en">
   
   <head>
@@ -78,7 +78,6 @@ const SendReceiveApllicationEmail = (data) => {
   </body>
   
   </html>`;
-  return template;
 };
 
 module.exports.SendReceiveApllicationEmail = SendReceiveApllicationEmail;

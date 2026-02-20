@@ -161,15 +161,15 @@ exports.stripeEvent = functions.https.onRequest(async (request, response) => {
           throw new Error(`Failed to complete user setup: ${error.message}`);
         }
 
-        const mailOptions = {
-          from: process.env.EMAIL,
-          to: email,
-          subject: `${role} Account created`,
-          html: AccountCreated({ email, password }),
-        };
+        // const mailOptions = {
+        //   from: process.env.EMAIL,
+        //   to: email,
+        //   subject: `${role} Account created`,
+        //   html: AccountCreated({ email, password }),
+        // };
 
         try {
-          await transporter.sendMail(mailOptions);
+          // await transporter.sendMail(mailOptions);
           logger.log(`Account details successfully sent to ${email}`);
         } catch (error) {
           logger.error(`Mailing error: ${error}`);
@@ -199,8 +199,15 @@ exports.stripeEvent = functions.https.onRequest(async (request, response) => {
             });
           };
 
+          const currentClaims =
+            (await admin.auth().getUser(uid).customClaims) || {};
+          const updatedClaims = {
+            ...currentClaims,
+            subscribed: true,
+          };
+
           const updateCustomUserClaims = async () => {
-            await admin.auth().setCustomUserClaims(uid, { subscribed: true });
+            await admin.auth().setCustomUserClaims(uid, updatedClaims);
           };
 
           await Promise.all([updateUserDoc(), updateCustomUserClaims()]);

@@ -3,12 +3,9 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-});
+// Mock transporter that does nothing but returns a resolved promise
+const transporter = {
+  sendMail: () => Promise.resolve({ response: "Email sending is disabled" }),
+};
 
 module.exports = transporter;

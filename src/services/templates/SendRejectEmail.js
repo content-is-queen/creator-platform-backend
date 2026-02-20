@@ -4,7 +4,7 @@ dotenv.config();
 
 const sendRejectEmail = (data) => {
   const { opportunityTitle, firstName } = data;
-  const template = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
   <html lang="en">
   
   <head>
@@ -79,7 +79,6 @@ const sendRejectEmail = (data) => {
   </body>
   
   </html>`;
-  return template;
 };
 
 module.exports.sendRejectEmail = sendRejectEmail;

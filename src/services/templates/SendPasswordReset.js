@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const SendPasswordReset = (emailData) => {
-  const template = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
   <html lang="en">
   
   <head>
@@ -79,7 +79,6 @@ const SendPasswordReset = (emailData) => {
   </body>
   
   </html>`;
-  return template;
 };
 
 module.exports = SendPasswordReset;

@@ -80,25 +80,12 @@ const cancelSubscription = async (req, res) => {
 
 const subscribeUser = async (req, res) => {
   const { sessionId, userId } = req.body;
-  const db = admin.firestore();
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid") {
-      // Retrieve the subscription ID
-      const subscriptionId = session.subscription;
-
-      // Update user to subscribed and store subscription ID
-      await db.collection("users").doc(userId).update({
-        subscribed: true,
-        subscriptionId,
-      });
-
-      await admin.auth().setCustomUserClaims(userId, { subscribed: true });
-
-      console.log(`${userId} subscribed successfully`);
-      res.status(200).json({ status: session.status, subscriptionId });
+      res.status(200).json({ status: session.status });
     } else {
       console.log(`Problem subscribing ${userId}`);
       res.status(400).json({
