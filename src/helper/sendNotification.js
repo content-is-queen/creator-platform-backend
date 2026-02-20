@@ -1,4 +1,4 @@
-const admin = require("../../functions/admin");
+const admin = require("./admin");
 
 async function sendNotification({ body, userId }) {
   try {

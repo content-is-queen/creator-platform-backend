@@ -2,7 +2,7 @@
 const dotenv = require("dotenv");
 const { v4: uuidv4 } = require("uuid"); // Import uuidv4 directly
 
-const admin = require("../../../functions/admin");
+const admin = require(".././admin");
 
 dotenv.config();
 
