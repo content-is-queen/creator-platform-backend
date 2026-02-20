@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
-const admin = require("../../../functions/admin");
+const admin = require(".././admin");
 const { v4: uuidv4 } = require("uuid"); // Import uuidv4 directly
 const Joi = require("joi");
 
@@ -55,6 +55,7 @@ const schema = {
     endDate: Joi.date().required(),
   }),
 };
+
 class OpportunitiesController {
   /**
    * @param {Object} req request Object.

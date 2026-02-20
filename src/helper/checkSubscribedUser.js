@@ -1,4 +1,4 @@
-const admin = require("../../functions/admin");
+const admin = require("./admin");
 const { Util } = require("./utils");
 
 const util = new Util();

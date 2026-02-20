@@ -2,7 +2,7 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
 /* eslint-disable quotes */
-const admin = require("../../../functions/admin");
+const admin = require(".././admin");
 
 dotenv.config();
 /**

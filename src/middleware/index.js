@@ -1,4 +1,4 @@
-const admin = require("../../functions/admin");
+const admin = require("./admin");
 const { Util } = require("../helper/utils");
 const util = new Util();
 const protect = async (req, res, next) => {
@@ -13,7 +13,7 @@ const protect = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
 
     const decodedToken = await admin.auth().verifyIdToken(token);
-    
+
     if (!decodedToken) {
       return res.status(401).json({ error: "Not Authenticated!" });
     }

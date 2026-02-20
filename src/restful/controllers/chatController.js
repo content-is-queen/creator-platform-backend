@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const admin = require("../../../functions/admin");
+const admin = require(".././admin");
 
 dotenv.config();
 
