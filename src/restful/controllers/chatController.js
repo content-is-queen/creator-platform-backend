@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-const admin = require(".././admin");
+const admin = require("../../../shared/firebaseAdmin");
 
 dotenv.config();
 

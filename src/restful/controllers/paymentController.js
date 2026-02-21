@@ -1,7 +1,7 @@
 // controllers/paymentController.js
 
 const stripe = require("stripe")(process.env.STRIPE_SK); // Make sure to set your Stripe secret key in your environment variables
-const admin = require(".././admin");
+const admin = require("../../../shared/firebaseAdmin");
 
 /**
  * Create a subscription for a customer.

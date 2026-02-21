@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const dotenv = require("dotenv");
-const admin = require(".././admin");
+const admin = require("../../../shared/firebaseAdmin");
 const { Util } = require("../../helper/utils");
 const Joi = require("joi");
 /* eslint-disable quotes */

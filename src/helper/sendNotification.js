@@ -1,4 +1,4 @@
-const admin = require("./admin");
+const admin = require("../../shared/firebaseAdmin");
 
 async function sendNotification({ body, userId }) {
   try {

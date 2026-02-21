@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { Util } = require("../../helper/utils");
-const admin = require(".././admin");
+const admin = require("../../../shared/firebaseAdmin");
 const { v4: uuidv4 } = require("uuid"); // Import uuidv4 directly
 const Joi = require("joi");
 
