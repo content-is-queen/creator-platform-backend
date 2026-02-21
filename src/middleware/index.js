@@ -1,4 +1,4 @@
-const admin = require("./admin");
+const admin = require("../../shared/firebaseAdmin");
 const { Util } = require("../helper/utils");
 const util = new Util();
 const protect = async (req, res, next) => {

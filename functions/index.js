@@ -1,21 +1,11 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
-const admin = require("./admin");
+const admin = require("../shared/firebaseAdmin");
 const stripe = require("stripe")(process.env.STRIPE_SK);
 const generator = require("generate-password");
 const functions = require("firebase-functions");
 const logger = require("firebase-functions/logger");
-const AccountCreated = require("./AccountCreatedHTML");
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-});
 
 const secret = process.env.STRIPE_WHSEC;
 
